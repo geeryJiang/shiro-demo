@@ -30,7 +30,7 @@
         1. 配置securityManager
      -->
     <bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
-        <property name="cacheManager" ref="cacheManager"/>
+        <!--<property name="cacheManager" ref="cacheManager"/>-->
         <!--<property name="realm" ref="jdbcRealm"/>-->
         <property name="authenticator" ref="authenticator"></property>
         <!-- 授权时会用到 securityManager 中的 realms 属性，故需要在此设置realms-->
@@ -181,6 +181,8 @@
             </value>
         </property>
     </bean>
+
+    <bean id="shiroService" class="com.atguigu.shiro.service.ShiroService"></bean>
 
 
 </beans>

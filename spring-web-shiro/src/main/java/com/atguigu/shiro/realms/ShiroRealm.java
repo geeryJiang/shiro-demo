@@ -2,11 +2,15 @@ package com.atguigu.shiro.realms;
 
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationInfo;
+import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.crypto.hash.SimpleHash;
 import org.apache.shiro.realm.AuthenticatingRealm;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.util.ByteSource;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @ClassName: ShiroRealm
@@ -16,7 +20,8 @@ import org.apache.shiro.util.ByteSource;
  * @Version: 1.0
  */
 // public class ShiroRealm implements Realm  {
-public class ShiroRealm extends AuthenticatingRealm {
+//public class ShiroRealm extends AuthenticatingRealm  {
+public class ShiroRealm extends AuthorizingRealm {
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
         System.out.println("doGetAuthenticationInfo:" + token.hashCode());
@@ -69,4 +74,24 @@ public class ShiroRealm extends AuthenticatingRealm {
         System.out.println(simpleHash);
     }
 
+    @Override
+    protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
+        System.out.println("doGetAuthorizationInfo...");
+
+        // 1. 从 PrincipalCollection 中获取登陆用户信息
+        Object principal = principals.getPrimaryPrincipal();
+
+        // 2. 利用登陆的用户信息来获取当前用户的角色和权限(从数据库获取)
+        Set<String> roles = new HashSet<>();
+        roles.add("user");
+        if ("admin".equals(principal)) {
+            roles.add("admin");
+        }
+
+        // 3. 创建 SimpleAuthorizationInfo ,并设置其 roles 属性
+        SimpleAuthorizationInfo info = new SimpleAuthorizationInfo(roles);
+
+        // 4. 返回 SimpleAuthorizationInfo 对象
+        return info;
+    }
 }
