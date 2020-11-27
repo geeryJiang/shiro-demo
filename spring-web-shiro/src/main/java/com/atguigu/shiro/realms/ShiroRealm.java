@@ -16,7 +16,7 @@ import org.apache.shiro.util.ByteSource;
  * @Version: 1.0
  */
 // public class ShiroRealm implements Realm  {
-public class ShiroRealm extends AuthorizingRealm {
+public class ShiroRealm extends AuthenticatingRealm {
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
         System.out.println("doGetAuthenticationInfo:" + token.hashCode());
@@ -69,9 +69,4 @@ public class ShiroRealm extends AuthorizingRealm {
         System.out.println(simpleHash);
     }
 
-    @Override
-    protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
-        System.out.println("doGetAuthorizationInfo...");
-        return null;
-    }
 }
