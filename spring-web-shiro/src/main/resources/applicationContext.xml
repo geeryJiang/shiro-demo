@@ -33,6 +33,9 @@
             </list>
         </property>
         <!--<property name="sessionManager" ref="sessionManager"/>-->
+
+        <!--<property name="rememberMeManager.cookie.maxAge" value="10"/>-->
+
     </bean>
     <!--
     2. 配置 CacheManager.
