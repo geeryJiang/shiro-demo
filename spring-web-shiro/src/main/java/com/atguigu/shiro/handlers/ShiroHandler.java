@@ -10,6 +10,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.servlet.http.HttpSession;
+
 /**
  * @ClassName: ShiroHandler
  * @Author: jiangguoqing
@@ -25,7 +27,8 @@ public class ShiroHandler {
     private ShiroService shiroService;
 
     @RequestMapping("/testShiroAnnotation")
-    public String testShiroAnnotation() {
+    public String testShiroAnnotation(HttpSession session) {
+        session.setAttribute("key", "value123456");
         shiroService.testMethod();
         return "redirect:/list.jsp";
     }
