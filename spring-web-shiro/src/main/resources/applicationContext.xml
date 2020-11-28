@@ -1,16 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:aop="http://www.springframework.org/schema/aop"
-       xmlns:tx="http://www.springframework.org/schema/tx"
-       xmlns:util="http://www.springframework.org/schema/util"
-       xmlns:context="http://www.springframework.org/schema/context"
        xsi:schemaLocation="
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-       http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
-       http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
-       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
-       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
 
     <!-- Sample RDBMS data source that would exist in any application - not Shiro related. -->
@@ -32,7 +24,7 @@
     <bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
         <!--<property name="cacheManager" ref="cacheManager"/>-->
         <!--<property name="realm" ref="jdbcRealm"/>-->
-        <property name="authenticator" ref="authenticator"></property>
+        <property name="authenticator" ref="authenticator"/>
         <!-- 授权时会用到 securityManager 中的 realms 属性，故需要在此设置realms-->
         <property name="realms">
             <list>
@@ -53,7 +45,7 @@
         <!-- If you don't have a pre-built net.sf.ehcache.CacheManager instance to inject, but you want
              a specific Ehcache configuration to be used, specify that here.  If you don't, a default
              will be used.: -->
-        <property name="cacheManagerConfigFile" value="classpath:ehcache.xml"/>
+        <!--<property name="cacheManagerConfigFile" value="classpath:ehcache.xml"/>-->
     </bean>
 
     <bean id="authenticator" class="org.apache.shiro.authc.pam.ModularRealmAuthenticator">
@@ -67,7 +59,7 @@
         认证策略:FirstSuccessfulStrategy,AllSuccessfulStrategy,AtLeastOneSuccessfulStrategy
          -->
         <property name="authenticationStrategy">
-            <bean class="org.apache.shiro.authc.pam.AtLeastOneSuccessfulStrategy"></bean>
+            <bean class="org.apache.shiro.authc.pam.AtLeastOneSuccessfulStrategy"/>
         </property>
     </bean>
 
@@ -92,8 +84,8 @@
         </property>-->
         <property name="credentialsMatcher">
             <bean class="org.apache.shiro.authc.credential.HashedCredentialsMatcher">
-                <property name="hashAlgorithmName" value="MD5"></property>
-                <property name="hashIterations" value="1024"></property>
+                <property name="hashAlgorithmName" value="MD5"/>
+                <property name="hashIterations" value="1024"/>
             </bean>
         </property>
     </bean>
@@ -101,8 +93,8 @@
     <bean id="secondRealm" class="com.atguigu.shiro.realms.SecondRealm">
         <property name="credentialsMatcher">
             <bean class="org.apache.shiro.authc.credential.HashedCredentialsMatcher">
-                <property name="hashAlgorithmName" value="SHA1"></property>
-                <property name="hashIterations" value="1024"></property>
+                <property name="hashAlgorithmName" value="SHA1"/>
+                <property name="hashIterations" value="1024"/>
             </bean>
         </property>
     </bean>
@@ -150,7 +142,7 @@
         <property name="successUrl" value="/list.jsp"/>
         <property name="unauthorizedUrl" value="/unauthorized.jsp"/>
 
-        <property name="filterChainDefinitionMap" ref="filterChainDefinitionMap"></property>
+        <property name="filterChainDefinitionMap" ref="filterChainDefinitionMap"/>
 
         <!-- The 'filters' property is not necessary since any declared javax.servlet.Filter bean
              defined will be automatically acquired and available via its beanName in chain
@@ -187,10 +179,26 @@
 
     <!-- 配置一个bean，该bean 实际上是一个map，通过实例工厂方法的方式 -->
     <bean id="filterChainDefinitionMap" factory-bean="filterChainDefinitionMapBuilder"
-          factory-method="buildFilterChainDefinitionMap"></bean>
-    <bean id="filterChainDefinitionMapBuilder" class="com.atguigu.shiro.factory.FilterChainDefinitionMapBuilder"></bean>
+          factory-method="buildFilterChainDefinitionMap"/>
+    <bean id="filterChainDefinitionMapBuilder" class="com.atguigu.shiro.factory.FilterChainDefinitionMapBuilder"/>
 
-    <bean id="shiroService" class="com.atguigu.shiro.service.ShiroService"></bean>
+    <bean id="shiroService" class="com.atguigu.shiro.service.ShiroService"/>
+
+    <!-- session id 生成器 -->
+    <bean id="sessionIdGenerator" class="org.apache.shiro.session.mgt.eis.JavaUuidSessionIdGenerator"/>
+    <!-- session Dao . 继承 EnterpriseCacheSessionDAO -->
+    <bean id="sessionDao" class="com.atguigu.shiro.realms.MySessionDao">
+        <!-- 缓存 -->
+        <!--<property name="activeSessionsCacheName" value="shiro-activeSessionCache"/>-->
+        <property name="sessionIdGenerator" ref="sessionIdGenerator"/>
+    </bean>
+    <!-- 会话管理器 -->
+    <bean id="sessionManager" class="org.apache.shiro.session.mgt.DefaultSessionManager">
+        <property name="globalSessionTimeout" value="18000"/>
+        <property name="deleteInvalidSessions" value="true"/>
+        <property name="sessionValidationSchedulerEnabled" value="true"/>
+        <property name="sessionDAO" ref="sessionDao"/>
+    </bean>
 
 
 </beans>
