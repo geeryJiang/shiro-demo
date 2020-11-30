@@ -10,4 +10,6 @@ public interface UsersMapper {
 
     Users selectByPrimaryKey(Long id);
 
+    Users selectByUserName(String userName);
+
 }
