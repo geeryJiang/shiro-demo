@@ -1,22 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
 
-
-    <!-- Sample RDBMS data source that would exist in any application - not Shiro related. -->
-    <!--<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-        <property name="driverClassName" value="org.hsqldb.jdbcDriver"/>
-        <property name="url" value="jdbc:hsqldb:mem:shiro-spring"/>
-        <property name="username" value="sa"/>
-    </bean>-->
-    <!-- Populates the sample database with sample users and roles. -->
-    <!--<bean id="bootstrapDataPopulator" class="org.apache.shiro.samples.spring.BootstrapDataPopulator">
-        <property name="dataSource" ref="dataSource"/>
-    </bean>-->
-    <!-- Simulated business-tier "Manager", not Shiro related, just an example -->
-    <!--<bean id="sampleManager" class="org.apache.shiro.samples.spring.DefaultSampleManager"/>-->
+    <!-- 扫描除了控制器以外的所有标签 -->
+    <context:component-scan base-package="com.test.shiro">
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+    <!-- 引入外部配置文件 -->
+    <context:property-placeholder location="classpath:dbconfig.properties"/>
+    <!-- 配置数据源 -->
+    <bean id="pooledDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="jdbcUrl" value="${jdbc.jdbcUrl}"/>
+        <property name="driverClass" value="${jdbc.driverClass}"/>
+        <property name="user" value="${jdbc.user}"/>
+        <property name="password" value="${jdbc.password}"/>
+    </bean>
+    <!-- =========== 配置和Mybatis的整合 =========== -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!-- 指定Mybatis全局配置文件的位置 -->
+        <property name="configLocation" value="classpath:mybatis-config.xml"/>
+        <property name="dataSource" ref="pooledDataSource"/>
+        <!-- 指定Mybatis的Mapper配置文件的位置 -->
+        <property name="mapperLocations" value="classpath:mapper/*.xml"/>
+    </bean>
+    <!-- 配置扫描器，将mybatis接口的实现加入到ioc容器中 -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!-- 扫描所有dao接口的实现，加入到ioc容器中 -->
+        <property name="basePackage" value="com.test.shiro.dao"/>
+    </bean>
+    <!-- 配置一个可以执行批量的sqlSession -->
+    <bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg name="sqlSessionFactory" ref="sqlSessionFactory"/>
+        <constructor-arg name="executorType" value="BATCH"/>
+    </bean>
+    <!-- =========== 事物管理器的配置 =========== -->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <!-- 控制数据源 -->
+        <property name="dataSource" ref="pooledDataSource"/>
+    </bean>
 
     <!--
         1. 配置securityManager
@@ -73,7 +96,7 @@
     	3. 配置 Realm
     	3.1 直接配置实现了 org.apache.shiro.realm.Realm 接口的 bean
     -->
-    <bean id="jdbcRealm" class="com.atguigu.shiro.realms.ShiroRealm">
+    <bean id="jdbcRealm" class="com.test.shiro.realms.ShiroRealm">
         <!--<property name="name" value="jdbcRealm"/>
         <property name="dataSource" ref="dataSource"/>
         <property name="credentialsMatcher">
@@ -93,7 +116,7 @@
         </property>
     </bean>
 
-    <bean id="secondRealm" class="com.atguigu.shiro.realms.SecondRealm">
+    <bean id="secondRealm" class="com.test.shiro.realms.SecondRealm">
         <property name="credentialsMatcher">
             <bean class="org.apache.shiro.authc.credential.HashedCredentialsMatcher">
                 <property name="hashAlgorithmName" value="SHA1"/>
@@ -183,14 +206,14 @@
     <!-- 配置一个bean，该bean 实际上是一个map，通过实例工厂方法的方式 -->
     <bean id="filterChainDefinitionMap" factory-bean="filterChainDefinitionMapBuilder"
           factory-method="buildFilterChainDefinitionMap"/>
-    <bean id="filterChainDefinitionMapBuilder" class="com.atguigu.shiro.factory.FilterChainDefinitionMapBuilder"/>
+    <bean id="filterChainDefinitionMapBuilder" class="com.test.shiro.factory.FilterChainDefinitionMapBuilder"/>
 
-    <bean id="shiroService" class="com.atguigu.shiro.service.ShiroService"/>
+    <bean id="shiroService" class="com.test.shiro.service.ShiroService"/>
 
     <!-- session id 生成器 -->
     <bean id="sessionIdGenerator" class="org.apache.shiro.session.mgt.eis.JavaUuidSessionIdGenerator"/>
     <!-- session Dao . 继承 EnterpriseCacheSessionDAO -->
-    <bean id="sessionDao" class="com.atguigu.shiro.realms.MySessionDao">
+    <bean id="sessionDao" class="com.test.shiro.realms.MySessionDao">
         <!-- 缓存 -->
         <!--<property name="activeSessionsCacheName" value="shiro-activeSessionCache"/>-->
         <property name="sessionIdGenerator" ref="sessionIdGenerator"/>

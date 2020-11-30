@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.test.shiro.dao.RolesMapper">
+  <resultMap id="BaseResultMap" type="com.test.shiro.entity.Roles">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="role_name" jdbcType="VARCHAR" property="roleName" />
+    <result column="description" jdbcType="VARCHAR" property="description" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, role_name, description
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from roles
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from roles
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.test.shiro.entity.Roles">
+    insert into roles (id, role_name, description
+      )
+    values (#{id,jdbcType=BIGINT}, #{roleName,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}
+      )
+  </insert>
+</mapper>
