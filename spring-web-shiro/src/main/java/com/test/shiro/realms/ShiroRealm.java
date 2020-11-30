@@ -1,6 +1,7 @@
 package com.test.shiro.realms;
 
 import com.test.shiro.entity.Users;
+import com.test.shiro.service.IRolesService;
 import com.test.shiro.service.IUserService;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationInfo;
@@ -26,7 +27,10 @@ import java.util.Set;
 public class ShiroRealm extends AuthorizingRealm {
 
     @Autowired
-    IUserService userService;
+    private IUserService userService;
+
+    @Autowired
+    private IRolesService rolesService;
 
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
@@ -82,11 +86,7 @@ public class ShiroRealm extends AuthorizingRealm {
         Object principal = principals.getPrimaryPrincipal();
 
         // 2. 利用登陆的用户信息来获取当前用户的角色和权限(从数据库获取)
-        Set<String> roles = new HashSet<>();
-        roles.add("user");
-        if ("admin".equals(principal)) {
-            roles.add("admin");
-        }
+        Set<String> roles = rolesService.selectByUserName(principal.toString());
 
         // 3. 创建 SimpleAuthorizationInfo ,并设置其 roles 属性
         SimpleAuthorizationInfo info = new SimpleAuthorizationInfo(roles);
