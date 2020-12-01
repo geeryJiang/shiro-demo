@@ -19,6 +19,11 @@
 package org.apache.shiro.samples;
 
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.Authenticator;
+import org.apache.shiro.authc.credential.CredentialsMatcher;
+import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
+import org.apache.shiro.authc.pam.AtLeastOneSuccessfulStrategy;
+import org.apache.shiro.authc.pam.ModularRealmAuthenticator;
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.realm.jdbc.JdbcRealm;
@@ -62,7 +67,7 @@ public class WebApp { //NOPMD
         // resource at that location)
         log.debug("AuthorizationException was thrown", e);
 
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
         map.put("status", HttpStatus.FORBIDDEN.value());
         map.put("message", "No message available");
         model.addAttribute("errors", map);
@@ -73,8 +78,14 @@ public class WebApp { //NOPMD
     @Bean
     public Realm realm() {
 
+
+        /*HashedCredentialsMatcher matcher = new HashedCredentialsMatcher();
+        // 设置密码加密算法
+        matcher.setHashAlgorithmName("MD5");
+
         // 通过从数据库获取用户角色权限信息
-        /*JdbcRealm realm = new JdbcRealm();
+        JdbcRealm realm = new JdbcRealm();
+        realm.setCredentialsMatcher(matcher);
         realm.setDataSource();
         // 使用用户名作为盐值
         realm.setSaltStyle(JdbcRealm.SaltStyle.EXTERNAL);
@@ -102,6 +113,14 @@ public class WebApp { //NOPMD
         chainDefinition.addPathDefinition("/login.html", "authc"); // need to accept POSTs from the login form
         chainDefinition.addPathDefinition("/logout", "logout");
         return chainDefinition;
+    }
+
+    // 默认认证策略配置，若需要修改认证策略，则可以手动设置
+    @Bean
+    public Authenticator authenticator() {
+        ModularRealmAuthenticator authenticator = new ModularRealmAuthenticator();
+        authenticator.setAuthenticationStrategy(new AtLeastOneSuccessfulStrategy());
+        return authenticator;
     }
 
     @ModelAttribute(name = "subject")
