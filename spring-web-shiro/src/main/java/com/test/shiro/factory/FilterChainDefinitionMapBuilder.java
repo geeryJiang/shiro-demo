@@ -1,6 +1,11 @@
 package com.test.shiro.factory;
 
+import com.test.shiro.service.IResourcesService;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @ClassName: FilterChainDefinitionMapBuilder
@@ -10,6 +15,9 @@ import java.util.LinkedHashMap;
  * @Version: 1.0
  */
 public class FilterChainDefinitionMapBuilder {
+
+    @Autowired
+    IResourcesService resourcesService;
 
     /**
      * anon: 允许立即访问路径而不执行任何类型的安全检查的过滤器。
@@ -28,18 +36,17 @@ public class FilterChainDefinitionMapBuilder {
      */
 
     public LinkedHashMap<String, String> buildFilterChainDefinitionMap() {
-        LinkedHashMap<String, String> map = new LinkedHashMap<>();
 
+        LinkedHashMap<String, String> map = new LinkedHashMap<>();
         map.put("/login.jsp", "anon");
         map.put("/shiro/login", "anon");
-        map.put("/shiro/logout", "logout");
-        map.put("/user.jsp", "authc,roles[user]");
-        map.put("/admin.jsp", "authc,roles[admin]");
 
-        map.put("/list.jsp", "user");
+        List<Map> maps = resourcesService.selectAllResourceAndPermission();
+        for (Map tmp : maps) {
+            map.put(tmp.get("url").toString(), tmp.get("permissionNames").toString());
+        }
 
         map.put("/**", "authc");
-
         return map;
     }
 
