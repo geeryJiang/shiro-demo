@@ -4,7 +4,7 @@ CREATE TABLE
     (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '自增主键',
         url VARCHAR(100) NOT NULL COMMENT '资源路径',
-        parent_url VARCHAR(100) NOT NULL COMMENT '资源父级路径',
+        parent_url VARCHAR(100) COMMENT '资源父级路径',
         rlevel TINYINT UNSIGNED NOT NULL COMMENT '资源层级',
         description VARCHAR(255) COMMENT '描述',
         PRIMARY KEY (id),
