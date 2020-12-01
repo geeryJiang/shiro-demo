@@ -21,6 +21,7 @@ package org.apache.shiro.samples;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.realm.Realm;
+import org.apache.shiro.realm.jdbc.JdbcRealm;
 import org.apache.shiro.realm.text.TextConfigurationRealm;
 import org.apache.shiro.spring.web.config.DefaultShiroFilterChainDefinition;
 import org.apache.shiro.spring.web.config.ShiroFilterChainDefinition;
@@ -71,6 +72,20 @@ public class WebApp { //NOPMD
 
     @Bean
     public Realm realm() {
+
+        // 通过从数据库获取用户角色权限信息
+        /*JdbcRealm realm = new JdbcRealm();
+        realm.setDataSource();
+        // 使用用户名作为盐值
+        realm.setSaltStyle(JdbcRealm.SaltStyle.EXTERNAL);
+        // 获取用户密码的查询SQL
+        realm.setAuthenticationQuery();
+        // 获取用户角色的查询SQL
+        realm.setUserRolesQuery();
+        realm.setPermissionsLookupEnabled(true);
+        // 获取用户权限的查询SQL
+        realm.setPermissionsQuery();*/
+
         TextConfigurationRealm realm = new TextConfigurationRealm();
         realm.setUserDefinitions("joe.coder=password,user\n" +
                 "jill.coder=password,admin");
