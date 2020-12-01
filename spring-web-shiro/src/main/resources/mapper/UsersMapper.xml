@@ -13,7 +13,7 @@
         id, user_name, email, password
     </sql>
 
-    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultType="Users">
         SELECT
           <include refid="Base_Column_List"/>
         FROM
@@ -29,14 +29,14 @@
             id = #{id,jdbcType=BIGINT}
     </delete>
 
-    <insert id="insert" parameterType="com.test.shiro.entity.Users">
+    <insert id="insert" parameterType="com.test.shiro.entity.Users" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO
             users (id, user_name, email, password)
         VALUES
             (#{id,jdbcType=BIGINT}, #{userName,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR},#{password,jdbcType=VARCHAR})
     </insert>
 
-    <select id="selectByUserName" parameterType="java.lang.String" resultMap="BaseResultMap">
+    <select id="selectByUserName" parameterType="java.lang.String" resultType="Users">
         SELECT
             <include refid="Base_Column_List"/>
         FROM

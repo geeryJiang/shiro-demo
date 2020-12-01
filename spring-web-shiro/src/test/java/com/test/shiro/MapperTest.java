@@ -24,8 +24,10 @@ public class MapperTest {
 	@Test
 	public void testCRUD() {
 
-        /*int insert = usersMapper.insert(new Users(null, "userName", "email", "password"));
-        System.out.println(insert);*/
+        Users users = new Users(null, "userName", "email", "password");
+        int insert = usersMapper.insert(users);
+        System.out.println(insert);
+        System.out.println(users.getId());
 
 		/*UsersMapper mapper = sqlSession.getMapper(UsersMapper.class);
 		for (int i = 0; i < 1000; i++) {
